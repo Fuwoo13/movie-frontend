@@ -17,7 +17,7 @@ function App() {
     // 새로 검색하는 거라면 0부터, 더 보기라면 기존 skip부터 시작
     const currentSkip = isReset ? 0 : skip;
     
-    fetch(`http://127.0.0.1:8000/movies?skip=${currentSkip}&limit=${limit}&search=${searchTerm}`)
+    fetch(`https://movie-backend-ebkm.onrender.com/movies?skip=${currentSkip}&limit=${limit}&search=${searchTerm}`)
       .then((response) => response.json())
       .then((data) => {
         if (isReset) {
@@ -47,7 +47,7 @@ function App() {
     setRecommendations([]);
     setIsLoading(true);
 
-    fetch(`http://127.0.0.1:8000/recommend/${movie.movie_id}`)
+    fetch(`https://movie-backend-ebkm.onrender.com/recommend/${movie.movie_id}`)
       .then((response) => response.json())
       .then((data) => {
         setRecommendations(data);
@@ -67,7 +67,7 @@ function App() {
       rating: score
     };
 
-    fetch('http://127.0.0.1:8000/rate', {
+    fetch('https://movie-backend-ebkm.onrender.com/rate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(ratingData),
