@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Jua&display=swap');
+
 /* 1. 배경 및 폰트 초기화 */
 body {
   background-color: #141414; /* 진한 검은색 배경 */
@@ -18,11 +20,12 @@ body {
 
 /* 3. 제목: 다시 크게 키웁니다 */
 h1 {
-  font-size: 3rem;
-  color: #e50914; /* 넷플릭스 레드 */
+  font-family: 'Jua', sans-serif; /* 👈 주아체 적용! */
+  font-size: 3.5rem;
+  color: #8d4549;
   text-align: center;
   margin-bottom: 40px;
-  letter-spacing: -1px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 /* 4. 검색창: 배경보다 밝게, 중앙 정렬 */
