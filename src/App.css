@@ -1,269 +1,133 @@
-#root {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
+/* 1. 배경 및 폰트 초기화 */
+body {
+  background-color: #141414; /* 진한 검은색 배경 */
+  color: #fff;
+  font-family: 'Pretendard', sans-serif;
+  margin: 0;
+  padding: 0;
+  overflow-x: hidden; /* 전체 페이지 가로 스크롤 방지 */
+}
+
+/* 2. 메인 컨테이너: 모든 걸 중앙에 가둡니다 */
+.App {
+  width: 90%; /* 화면의 90%만 사용 */
+  max-width: 1200px; /* 너무 커지지 않게 제한 */
+  margin: 0 auto; /* 중앙 정렬 */
+  padding-top: 50px;
+}
+
+/* 3. 제목: 다시 크게 키웁니다 */
+h1 {
+  font-size: 3rem;
+  color: #e50914; /* 넷플릭스 레드 */
   text-align: center;
-}
-
-.App h1 {
   margin-bottom: 40px;
+  letter-spacing: -1px;
 }
 
-.movie-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-  gap: 20px;
+/* 4. 검색창: 배경보다 밝게, 중앙 정렬 */
+.search-bar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 60px;
 }
 
-.movie-card {
-  background-color: #2a2a2a;
-  border-radius: 12px;
-  padding: 20px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-  transition: transform 0.2s;
+.search-bar input {
+  width: 60%;
+  padding: 15px 20px;
+  background: #333;
   border: 1px solid #444;
+  border-radius: 4px 0 0 4px;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.search-bar button {
+  padding: 0 30px;
+  background: #e50914;
+  color: #fff;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* 5. 가로 스크롤: 영화들이 화면 안에서만 스크롤 되게 */
+.section-title {
+  font-size: 1.5rem;
+  margin-bottom: 20px;
   text-align: left;
 }
 
+.movie-carousel {
+  display: flex;
+  gap: 15px;
+  overflow-x: scroll; /* 가로 스크롤 강제 */
+  padding-bottom: 20px;
+  /* 스크롤바 디자인 */
+  scrollbar-width: thin;
+  scrollbar-color: #444 transparent;
+}
+
+/* 6. 영화 카드: 큼직하고 고급스럽게 */
+.movie-card {
+  flex: 0 0 200px; /* 카드 너비 고정 */
+  height: 300px;
+  background: #222;
+  border-radius: 8px;
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  transition: transform 0.3s;
+  cursor: pointer;
+  border: 1px solid #333;
+}
+
 .movie-card:hover {
-  transform: translateY(-8px);
-  border-color: #646cff;
+  transform: scale(1.05); /* 마우스 올리면 커짐 */
+  border-color: #e50914;
 }
 
 .movie-card h3 {
-  margin: 0 0 15px 0;
-  color: #646cff;
-  font-size: 1.2rem;
+  font-size: 1rem;
+  margin: 0 0 5px 0;
+  white-space: normal; /* 제목 길면 다음 줄로 */
 }
 
 .movie-card p {
+  font-size: 0.8rem;
+  color: #999;
   margin: 0;
-  color: #ccc;
-  font-size: 0.9rem;
-}
-/* --- 추가되는 CSS (App.css 맨 아래에 붙여넣기) --- */
-
-/* 카드에 마우스 올렸을 때 클릭할 수 있다는 표시(손가락) 추가 */
-.movie-card {
-  cursor: pointer; 
 }
 
-/* 팝업창 뒤의 어두운 배경 */
+/* 7. 더 보기 버튼 */
+.load-more-btn {
+  display: block;
+  margin: 50px auto;
+  background: transparent;
+  color: #fff;
+  border: 1px solid #fff;
+  padding: 10px 30px;
+  cursor: pointer;
+}
+
+/* 8. 팝업창(모달): 화면 정중앙에 크게 */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100vw;
-  height: 100vh;
-  background-color: rgba(0, 0, 0, 0.7);
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(0,0,0,0.9);
   display: flex;
   justify-content: center;
   align-items: center;
   z-index: 1000;
-  animation: fadeIn 0.3s ease;
 }
 
-/* 팝업창 본체 */
 .modal-content {
-  background-color: #1e1e1e;
+  background: #181818;
   padding: 40px;
-  border-radius: 20px;
+  border-radius: 10px;
   width: 80%;
-  max-width: 600px;
-  position: relative;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-  border: 1px solid #444;
-}
-
-.close-btn {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: none;
-  border: none;
-  color: #ccc;
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-.close-btn:hover {
-  color: white;
-}
-
-.modal-title {
-  margin-top: 0;
-}
-
-.highlight {
-  color: #646cff;
-}
-
-.modal-subtitle {
-  color: #aaa;
-  margin-bottom: 30px;
-}
-
-/* 추천 영화 목록 레이아웃 */
-.recommendation-list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-
-/* 추천 영화 카드 */
-.rec-card {
-  background-color: #2a2a2a;
-  padding: 15px 20px;
-  border-radius: 10px;
-  border-left: 5px solid #646cff;
-  text-align: left;
-}
-
-.rec-card h4 {
-  margin: 0 0 5px 0;
-  color: white;
-}
-
-.rec-card p {
-  margin: 0;
-  color: #aaa;
-  font-size: 0.85rem;
-}
-
-.loading-box {
-  padding: 40px 0;
-  color: #646cff;
-  font-weight: bold;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
-}
-/* --- 별점 주기 UI 스타일 --- */
-.rating-box {
-  background-color: #2a2a2a;
-  padding: 15px;
-  border-radius: 10px;
-  margin-bottom: 25px;
+  max-width: 700px;
   text-align: center;
-  border: 1px dashed #646cff;
-}
-
-.rating-box p {
-  margin: 0 0 10px 0;
-  font-weight: bold;
-  color: white;
-}
-
-.stars {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-}
-
-.star-btn {
-  background-color: #444;
-  color: white;
-  border: none;
-  padding: 8px 15px;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: all 0.2s;
-  font-weight: bold;
-}
-
-.star-btn:hover {
-  background-color: #ffd700; /* 호버 시 황금색으로 변신! */
-  color: black;
-  transform: scale(1.1);
-}
-/* --- 검색창 및 더 보기 버튼 스타일 --- */
-.search-bar {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 30px;
-}
-
-.search-bar input {
-  padding: 12px 20px;
-  font-size: 1rem;
-  width: 100%;
-  max-width: 400px;
-  border-radius: 25px;
-  border: 1px solid #444;
-  background-color: #1a1a1a;
-  color: white;
-  outline: none;
-}
-
-.search-bar input:focus {
-  border-color: #646cff;
-}
-
-.search-bar button {
-  padding: 12px 25px;
-  font-size: 1rem;
-  border-radius: 25px;
-  background-color: #646cff;
-  color: white;
-  border: none;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.search-bar button:hover {
-  background-color: #535bf2;
-}
-
-.load-more-btn {
-  margin-top: 40px;
-  padding: 15px 40px;
-  font-size: 1.1rem;
-  border-radius: 30px;
-  background-color: #333;
-  color: white;
-  border: 1px solid #555;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.load-more-btn:hover {
-  background-color: #646cff;
-  border-color: #646cff;
-  transform: translateY(-3px);
-}
-/* 🎬 넷플릭스 스타일 가로 스크롤 컨테이너 */
-.movie-carousel {
-  display: flex;
-  overflow-x: auto; /* 가로 스크롤 활성화 */
-  gap: 20px; /* 영화 포스터 사이의 간격 */
-  padding: 20px 0;
-  scroll-behavior: smooth; /* 부드러운 스크롤 */
-  /* 모바일에서 스와이프할 때 촥촥 감기게 하는 옵션 */
-  scroll-snap-type: x mandatory; 
-}
-
-/* 스크롤바 숨기기 (더 깔끔하게 보이도록) */
-.movie-carousel::-webkit-scrollbar {
-  display: none; 
-}
-.movie-carousel {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-}
-
-/* 개별 영화 카드 디자인 */
-.movie-card {
-  flex: 0 0 auto; /* 크기가 찌그러지지 않게 고정 */
-  width: 200px; /* 카드 하나의 너비 (원하는 대로 조절 가능) */
-  scroll-snap-align: start; /* 스크롤할 때 카드 시작점에 딱 맞춰서 멈춤 */
-  transition: transform 0.3s ease; /* 마우스 올렸을 때 애니메이션 준비 */
-  cursor: pointer;
-}
-
-/* 마우스를 올렸을 때 살짝 커지는 효과 (넷플릭스 느낌!) */
-.movie-card:hover {
-  transform: scale(1.05);
 }

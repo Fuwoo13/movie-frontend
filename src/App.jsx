@@ -7,12 +7,10 @@ function App() {
   const [recommendations, setRecommendations] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // 🌟 검색 및 페이징을 위한 State
   const [searchTerm, setSearchTerm] = useState("");
   const [skip, setSkip] = useState(0);
   const limit = 20;
 
-  // 🌟 영화 데이터를 백엔드에서 가져오는 함수
   const fetchMovies = (isReset = false) => {
     const currentSkip = isReset ? 0 : skip;
     
@@ -69,7 +67,7 @@ function App() {
     })
       .then((response) => response.json())
       .then((data) => {
-        alert(`'${selectedMovie.title}'에 {score}점을 주셨습니다! ⭐️`);
+        alert(`'${selectedMovie.title}'에 ${score}점을 주셨습니다! ⭐️`);
       })
       .catch((error) => console.error('별점 저장 에러:', error));
   };
@@ -77,67 +75,77 @@ function App() {
   const closeModal = () => setSelectedMovie(null);
 
   return (
-    <div className="App">
-      <h1>🎬 나의 AI 영화 추천 갤러리</h1>
-      
-      <form onSubmit={handleSearch} className="search-bar">
-        <input 
-          type="text" 
-          placeholder="영화 제목을 검색해보세요 (예: Toy)" 
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-        />
-        <button type="submit">검색</button>
-      </form>
+   <div className="App">
+      <header className="main-header">
+        <h1>9조 영화추천 AI 사이트</h1>
+        <div className="search-container"> {/* 👈 컨테이너 하나 더 추가 */}
+          <form onSubmit={handleSearch} className="search-bar">
+            <input 
+              type="text" 
+              placeholder="어떤 영화를 찾으시나요?" 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+            <button type="submit">검색</button>
+          </form>
+        </div>
+      </header>
 
-      {/* 🚀 넷플릭스 스타일 가로 스크롤 적용 부분 */}
-      <div className="movie-carousel">
-        {movies.map((movie, index) => (
-          /* ✅ 고유한 키 값을 위해 백틱(`)을 사용해 movie_id와 index를 조합했습니다. */
-          <div 
-            key={`${movie.movie_id}-${index}`} 
-            className="movie-card" 
-            onClick={() => handleMovieClick(movie)}
-          >
-            <h3>{movie.title}</h3>
-            <p>🍿 {movie.genres.split('|').join(', ')}</p>
-          </div>
-        ))}
-      </div>
+      <main className="content-area">
+        <h2 className="section-title">지금 뜨는 영화 목록</h2>
+        <div className="movie-carousel">
+          {movies.map((movie, index) => (
+            <div 
+              key={`${movie.movie_id}-${index}`} 
+              className="movie-card" 
+              onClick={() => handleMovieClick(movie)}
+            >
+              <div className="card-info">
+                <h3>{movie.title}</h3>
+                <p>🎬 {movie.genres.split('|').join(' · ')}</p>
+              </div>
+            </div>
+          ))}
+        </div>
 
-      {movies.length > 0 && (
-        <button className="load-more-btn" onClick={() => fetchMovies(false)}>
-          영화 더 보기 🍿
-        </button>
-      )}
+        {movies.length > 0 && (
+          <button className="load-more-btn" onClick={() => fetchMovies(false)}>
+            더 많은 영화 탐색하기 🍿
+          </button>
+        )}
+      </main>
 
+      {/* 팝업창(모달) 디자인도 일관성 있게 유지 */}
       {selectedMovie && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
             <button className="close-btn" onClick={closeModal}>✕</button>
-            <h2 className="modal-title"><span className="highlight">'{selectedMovie.title}'</span> 맘에 드셨나요?</h2>
+            <h2 className="modal-title">
+              <span className="highlight">'{selectedMovie.title}'</span> 맘에 드셨나요?
+            </h2>
             
             <div className="rating-box">
-              <p>이 영화, 내 평점은?</p>
+              <p>내 취향 별점 남기기</p>
               <div className="stars">
                 {[1, 2, 3, 4, 5].map((num) => (
-                  <button key={num} className="star-btn" onClick={() => handleRating(num)}>{num}점</button>
+                  <button key={num} className="star-btn" onClick={() => handleRating(num)}>
+                    {num}점
+                  </button>
                 ))}
               </div>
             </div>
 
-            <p className="modal-subtitle">AI가 분석한 취향 저격 추천 영화입니다 👀</p>
+            <p className="modal-subtitle">이 영화를 좋아하신다면, 이런 영화는 어때요?</p>
             {isLoading ? (
               <div className="loading-box">
-                <p>🤖 AI가 분석 중...</p>
+                <p className="pulse">🤖 AI가 당신의 취향을 분석 중...</p>
               </div>
             ) : (
               <div className="recommendation-list">
                 {recommendations.map((rec, recIndex) => (
-                  /* ✅ 추천 목록에도 중복 키 방지를 위해 index를 활용했습니다. */
                   <div key={`${rec.movie_id}-${recIndex}`} className="rec-card">
                     <h4>{rec.title}</h4>
-                    <p>{rec.genres.split('|').join(', ')}</p>
+                    <p>{rec.genres.split('|').join(' · ')}</p>
                   </div>
                 ))}
               </div>
