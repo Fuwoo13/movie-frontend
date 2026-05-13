@@ -18,9 +18,9 @@ body {
   padding-top: 50px;
 }
 
-/* 3. 제목: 다시 크게 키웁니다 */
+/* 3. 제목: 9조 간판 (주아체 유지) */
 h1 {
-  font-family: 'Jua', sans-serif; /* 👈 주아체 적용! */
+  font-family: 'Jua', sans-serif;
   font-size: 3.5rem;
   color: #8d4549;
   text-align: center;
@@ -72,35 +72,59 @@ h1 {
   scrollbar-color: #444 transparent;
 }
 
-/* 6. 영화 카드: 큼직하고 고급스럽게 */
+/* 6. 영화 카드: 포스터 이미지가 꽉 차도록 수정 🌟 */
 .movie-card {
-  flex: 0 0 200px; /* 카드 너비 고정 */
+  flex: 0 0 200px; 
   height: 300px;
   background: #222;
   border-radius: 8px;
-  padding: 15px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
+  justify-content: flex-end; /* 텍스트를 맨 아래로 밀어냄 */
   transition: transform 0.3s;
   cursor: pointer;
   border: 1px solid #333;
+  /* 🌟 핵심 추가: 패딩 삭제, 포스터 가두기 */
+  position: relative; 
+  overflow: hidden; 
 }
 
 .movie-card:hover {
-  transform: scale(1.05); /* 마우스 올리면 커짐 */
+  transform: scale(1.05); 
   border-color: #e50914;
+}
+
+/* 📸 새로 추가된 포스터 이미지 디자인 */
+.movie-poster {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* 이미지가 찌그러지지 않고 꽉 차게 */
+  z-index: 1; /* 글씨보다 뒤에 깔리게 설정 */
+}
+
+/* 📝 카드 하단 텍스트 정보 디자인 (글씨가 잘 보이게 검은 그라데이션) */
+.movie-card .card-info {
+  position: relative;
+  z-index: 2; /* 이미지 위로 올라오게 설정 */
+  background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
+  padding: 15px;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .movie-card h3 {
   font-size: 1rem;
   margin: 0 0 5px 0;
-  white-space: normal; /* 제목 길면 다음 줄로 */
+  white-space: normal; 
+  color: #fff;
 }
 
 .movie-card p {
   font-size: 0.8rem;
-  color: #999;
+  color: #ccc;
   margin: 0;
 }
 
@@ -133,4 +157,48 @@ h1 {
   width: 80%;
   max-width: 700px;
   text-align: center;
+}
+
+/* 팝업창 내부 디테일 (버튼, 별점, 추천 카드 등) */
+.close-btn {
+  float: right;
+  background: transparent;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.rating-box {
+  margin: 20px 0;
+}
+
+.star-btn {
+  background: #333;
+  color: white;
+  border: 1px solid #555;
+  padding: 5px 15px;
+  margin: 0 5px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.star-btn:hover {
+  background: #e50914;
+  border-color: #e50914;
+}
+
+.recommendation-list {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 10px 0;
+}
+
+.rec-card {
+  flex: 0 0 150px;
+  background: #222;
+  padding: 10px;
+  border-radius: 8px;
+  text-align: left;
 }

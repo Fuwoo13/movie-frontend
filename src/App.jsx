@@ -78,7 +78,7 @@ function App() {
    <div className="App">
       <header className="main-header">
         <h1>9조 영화추천 AI 사이트</h1>
-        <div className="search-container"> {/* 👈 컨테이너 하나 더 추가 */}
+        <div className="search-container">
           <form onSubmit={handleSearch} className="search-bar">
             <input 
               type="text" 
@@ -100,6 +100,12 @@ function App() {
               className="movie-card" 
               onClick={() => handleMovieClick(movie)}
             >
+              {/* 📸 포스터 이미지가 추가된 부분입니다 */}
+              <img 
+                src={`https://placehold.co/300x450/111/e50914?text=${encodeURIComponent(movie.title.substring(0, 15))}`} 
+                alt={movie.title} 
+                className="movie-poster" 
+              />
               <div className="card-info">
                 <h3>{movie.title}</h3>
                 <p>🎬 {movie.genres.split('|').join(' · ')}</p>
