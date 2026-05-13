@@ -234,3 +234,36 @@
   border-color: #646cff;
   transform: translateY(-3px);
 }
+/* 🎬 넷플릭스 스타일 가로 스크롤 컨테이너 */
+.movie-carousel {
+  display: flex;
+  overflow-x: auto; /* 가로 스크롤 활성화 */
+  gap: 20px; /* 영화 포스터 사이의 간격 */
+  padding: 20px 0;
+  scroll-behavior: smooth; /* 부드러운 스크롤 */
+  /* 모바일에서 스와이프할 때 촥촥 감기게 하는 옵션 */
+  scroll-snap-type: x mandatory; 
+}
+
+/* 스크롤바 숨기기 (더 깔끔하게 보이도록) */
+.movie-carousel::-webkit-scrollbar {
+  display: none; 
+}
+.movie-carousel {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* 개별 영화 카드 디자인 */
+.movie-card {
+  flex: 0 0 auto; /* 크기가 찌그러지지 않게 고정 */
+  width: 200px; /* 카드 하나의 너비 (원하는 대로 조절 가능) */
+  scroll-snap-align: start; /* 스크롤할 때 카드 시작점에 딱 맞춰서 멈춤 */
+  transition: transform 0.3s ease; /* 마우스 올렸을 때 애니메이션 준비 */
+  cursor: pointer;
+}
+
+/* 마우스를 올렸을 때 살짝 커지는 효과 (넷플릭스 느낌!) */
+.movie-card:hover {
+  transform: scale(1.05);
+}

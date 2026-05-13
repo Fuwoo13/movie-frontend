@@ -7,41 +7,37 @@ function App() {
   const [recommendations, setRecommendations] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  // 🌟 검색 및 페이징을 위한 State 추가
+  // 🌟 검색 및 페이징을 위한 State
   const [searchTerm, setSearchTerm] = useState("");
   const [skip, setSkip] = useState(0);
-  const limit = 20; // 한 번에 가져올 영화 개수
+  const limit = 20;
 
   // 🌟 영화 데이터를 백엔드에서 가져오는 함수
   const fetchMovies = (isReset = false) => {
-    // 새로 검색하는 거라면 0부터, 더 보기라면 기존 skip부터 시작
     const currentSkip = isReset ? 0 : skip;
     
     fetch(`https://movie-backend-ebkm.onrender.com/movies?skip=${currentSkip}&limit=${limit}&search=${searchTerm}`)
       .then((response) => response.json())
       .then((data) => {
         if (isReset) {
-          setMovies(data); // 새로 검색 시 기존 목록을 덮어씀
+          setMovies(data);
         } else {
-          setMovies((prev) => [...prev, ...data]); // 더 보기 시 기존 목록 아래에 이어 붙임
+          setMovies((prev) => [...prev, ...data]);
         }
-        setSkip(currentSkip + limit); // 다음에 가져올 시작점 업데이트
+        setSkip(currentSkip + limit);
       })
       .catch((error) => console.error('데이터 에러:', error));
   };
 
-  // 1. 처음 화면이 켜질 때 영화 목록 1페이지 가져오기
   useEffect(() => {
     fetchMovies(true);
   }, []);
 
-  // 🌟 2. 검색 버튼을 눌렀을 때 실행되는 함수
   const handleSearch = (e) => {
-    e.preventDefault(); // 새로고침 방지
+    e.preventDefault();
     fetchMovies(true);
   };
 
-  // 3. 영화 카드를 클릭했을 때 실행되는 함수 (이전과 동일)
   const handleMovieClick = (movie) => {
     setSelectedMovie(movie);
     setRecommendations([]);
@@ -59,7 +55,6 @@ function App() {
       });
   };
 
-  // 4. 별점 버튼 기능 (이전과 동일)
   const handleRating = (score) => {
     const ratingData = {
       user_id: 1, 
@@ -74,7 +69,7 @@ function App() {
     })
       .then((response) => response.json())
       .then((data) => {
-        alert(`'${selectedMovie.title}'에 ${score}점을 주셨습니다! ⭐️`);
+        alert(`'${selectedMovie.title}'에 {score}점을 주셨습니다! ⭐️`);
       })
       .catch((error) => console.error('별점 저장 에러:', error));
   };
@@ -85,7 +80,6 @@ function App() {
     <div className="App">
       <h1>🎬 나의 AI 영화 추천 갤러리</h1>
       
-      {/* 🌟 새로 추가되는 검색창 UI */}
       <form onSubmit={handleSearch} className="search-bar">
         <input 
           type="text" 
@@ -96,23 +90,27 @@ function App() {
         <button type="submit">검색</button>
       </form>
 
-      <div className="movie-grid">
-        {movies.map((movie) => (
-          <div key={movie.movie_id} className="movie-card" onClick={() => handleMovieClick(movie)}>
+      {/* 🚀 넷플릭스 스타일 가로 스크롤 적용 부분 */}
+      <div className="movie-carousel">
+        {movies.map((movie, index) => (
+          /* ✅ 고유한 키 값을 위해 백틱(`)을 사용해 movie_id와 index를 조합했습니다. */
+          <div 
+            key={`${movie.movie_id}-${index}`} 
+            className="movie-card" 
+            onClick={() => handleMovieClick(movie)}
+          >
             <h3>{movie.title}</h3>
             <p>🍿 {movie.genres.split('|').join(', ')}</p>
           </div>
         ))}
       </div>
 
-      {/* 🌟 더 보기 버튼 UI */}
       {movies.length > 0 && (
         <button className="load-more-btn" onClick={() => fetchMovies(false)}>
           영화 더 보기 🍿
         </button>
       )}
 
-      {/* 팝업창 (모달) 코드는 이전과 동일하게 유지 */}
       {selectedMovie && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -135,8 +133,9 @@ function App() {
               </div>
             ) : (
               <div className="recommendation-list">
-                {recommendations.map((rec) => (
-                  <div key={rec.movie_id} className="rec-card">
+                {recommendations.map((rec, recIndex) => (
+                  /* ✅ 추천 목록에도 중복 키 방지를 위해 index를 활용했습니다. */
+                  <div key={`${rec.movie_id}-${recIndex}`} className="rec-card">
                     <h4>{rec.title}</h4>
                     <p>{rec.genres.split('|').join(', ')}</p>
                   </div>
