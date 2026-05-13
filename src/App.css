@@ -2,23 +2,23 @@
 
 /* 1. 배경 및 폰트 초기화 */
 body {
-  background-color: #141414; /* 진한 검은색 배경 */
+  background-color: #141414;
   color: #fff;
   font-family: 'Pretendard', sans-serif;
   margin: 0;
   padding: 0;
-  overflow-x: hidden; /* 전체 페이지 가로 스크롤 방지 */
+  overflow-x: hidden;
 }
 
-/* 2. 메인 컨테이너: 모든 걸 중앙에 가둡니다 */
+/* 2. 메인 컨테이너 */
 .App {
-  width: 90%; /* 화면의 90%만 사용 */
-  max-width: 1200px; /* 너무 커지지 않게 제한 */
-  margin: 0 auto; /* 중앙 정렬 */
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
   padding-top: 50px;
 }
 
-/* 3. 제목: 9조 간판 (주아체 유지) */
+/* 3. 제목: 9조 간판 */
 h1 {
   font-family: 'Jua', sans-serif;
   font-size: 3.5rem;
@@ -28,7 +28,7 @@ h1 {
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
-/* 4. 검색창: 배경보다 밝게, 중앙 정렬 */
+/* 4. 검색창 */
 .search-bar {
   display: flex;
   justify-content: center;
@@ -55,24 +55,24 @@ h1 {
   cursor: pointer;
 }
 
-/* 5. 가로 스크롤: 영화들이 화면 안에서만 스크롤 되게 */
+/* 5. 가로 스크롤 섹션 */
 .section-title {
   font-size: 1.5rem;
   margin-bottom: 20px;
   text-align: left;
+  color: #fff; /* 👈 이 부분을 추가하세요! (흰색) */
 }
 
 .movie-carousel {
   display: flex;
   gap: 15px;
-  overflow-x: scroll; /* 가로 스크롤 강제 */
+  overflow-x: scroll;
   padding-bottom: 20px;
-  /* 스크롤바 디자인 */
   scrollbar-width: thin;
   scrollbar-color: #444 transparent;
 }
 
-/* 6. 영화 카드: 포스터 이미지가 꽉 차도록 수정 🌟 */
+/* 6. 메인 영화 카드 */
 .movie-card {
   flex: 0 0 200px; 
   height: 300px;
@@ -80,11 +80,10 @@ h1 {
   border-radius: 8px;
   display: flex;
   flex-direction: column;
-  justify-content: flex-end; /* 텍스트를 맨 아래로 밀어냄 */
+  justify-content: flex-end;
   transition: transform 0.3s;
   cursor: pointer;
   border: 1px solid #333;
-  /* 🌟 핵심 추가: 패딩 삭제, 포스터 가두기 */
   position: relative; 
   overflow: hidden; 
 }
@@ -94,21 +93,19 @@ h1 {
   border-color: #e50914;
 }
 
-/* 📸 새로 추가된 포스터 이미지 디자인 */
 .movie-poster {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover; /* 이미지가 찌그러지지 않고 꽉 차게 */
-  z-index: 1; /* 글씨보다 뒤에 깔리게 설정 */
+  object-fit: cover;
+  z-index: 1;
 }
 
-/* 📝 카드 하단 텍스트 정보 디자인 (글씨가 잘 보이게 검은 그라데이션) */
 .movie-card .card-info {
   position: relative;
-  z-index: 2; /* 이미지 위로 올라오게 설정 */
+  z-index: 2;
   background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
   padding: 15px;
   width: 100%;
@@ -139,7 +136,7 @@ h1 {
   cursor: pointer;
 }
 
-/* 8. 팝업창(모달): 화면 정중앙에 크게 */
+/* 8. 팝업창 (모달) 스타일 🌟 */
 .modal-overlay {
   position: fixed;
   top: 0; left: 0; width: 100%; height: 100%;
@@ -152,53 +149,97 @@ h1 {
 
 .modal-content {
   background: #181818;
-  padding: 40px;
-  border-radius: 10px;
-  width: 80%;
-  max-width: 700px;
+  padding: 30px;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 800px;
   text-align: center;
+  max-height: 90vh;
+  overflow-y: auto; /* 내용 많으면 모달 안에서 스크롤 */
+  border: 1px solid #333;
 }
 
-/* 팝업창 내부 디테일 (버튼, 별점, 추천 카드 등) */
 .close-btn {
-  float: right;
+  position: absolute;
+  top: 20px;
+  right: 20px;
   background: transparent;
   border: none;
   color: white;
-  font-size: 1.5rem;
+  font-size: 2rem;
   cursor: pointer;
 }
 
-.rating-box {
-  margin: 20px 0;
+.modal-title { 
+  font-size: 1.8rem; 
+  margin-bottom: 10px; 
+  color: #fff; /* 👈 이 부분을 추가하세요! (흰색) */
 }
+.highlight { color: #e50914; }
+.modal-subtitle { color: #aaa; margin: 20px 0 10px; }
 
+/* 별점 박스 */
+.rating-box { margin: 20px 0; padding: 20px; background: #222; border-radius: 8px; }
 .star-btn {
-  background: #333;
-  color: white;
-  border: 1px solid #555;
-  padding: 5px 15px;
-  margin: 0 5px;
-  border-radius: 20px;
-  cursor: pointer;
+  background: #333; color: white; border: 1px solid #555;
+  padding: 8px 18px; margin: 0 5px; border-radius: 20px; cursor: pointer; transition: 0.2s;
 }
+.star-btn:hover { background: #e50914; border-color: #e50914; }
 
-.star-btn:hover {
-  background: #e50914;
-  border-color: #e50914;
-}
-
+/* 🌟 추천 영화 리스트 (가로 스크롤) */
 .recommendation-list {
   display: flex;
-  gap: 10px;
+  gap: 15px;
   overflow-x: auto;
-  padding: 10px 0;
+  padding: 15px 0;
+  scrollbar-width: thin;
+  scrollbar-color: #555 transparent;
 }
 
+/* 🌟 추천 영화 카드 (폭발 방지 핵심 디자인) */
 .rec-card {
-  flex: 0 0 150px;
+  flex: 0 0 150px; /* 너비 고정 */
+  height: 220px;   /* 높이 고정 */
   background: #222;
-  padding: 10px;
   border-radius: 8px;
   text-align: left;
+  position: relative; /* 이미지가 이 카드 안에 갇히게 함 */
+  overflow: hidden;   /* 삐져나온 이미지 자동 절단 */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  border: 1px solid #444;
 }
+
+/* 추천 카드 내부 텍스트 배경 */
+.rec-card-info {
+  position: relative;
+  z-index: 2; /* 이미지보다 위로 */
+  background: linear-gradient(to top, rgba(0,0,0,1) 0%, rgba(0,0,0,0.7) 70%, transparent 100%);
+  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.rec-card h4 {
+  font-size: 0.9rem;
+  margin: 0 0 3px 0;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis; /* 제목 길면 ... 처리 */
+}
+
+.rec-card p {
+  font-size: 0.7rem;
+  color: #aaa;
+  margin: 0;
+}
+
+/* 로딩 애니메이션 */
+@keyframes pulse {
+  0% { opacity: 0.5; }
+  50% { opacity: 1; }
+  100% { opacity: 0.5; }
+}
+.pulse { animation: pulse 1.5s infinite ease-in-out; color: #e50914; }
