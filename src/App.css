@@ -243,3 +243,125 @@ h1 {
   100% { opacity: 0.5; }
 }
 .pulse { animation: pulse 1.5s infinite ease-in-out; color: #e50914; }
+/* ========================================= */
+/* 🔐 로그인 / 회원가입 UI 디자인 */
+/* ========================================= */
+
+/* 헤더 상단 로그인 버튼 위치 조정 */
+.main-header {
+  position: relative; /* 자식 요소 절대 위치 배치를 위한 기준 */
+}
+
+.auth-header-section {
+  position: absolute;
+  top: 0px;
+  right: 10px;
+}
+
+.login-btn {
+  background-color: #e50914;
+  color: white;
+  border: none;
+  padding: 8px 20px;
+  border-radius: 4px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.login-btn:hover { background-color: #f40612; }
+
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.welcome-text {
+  font-size: 0.9rem;
+  color: #fff;
+}
+
+.logout-btn {
+  background-color: transparent;
+  color: #aaa;
+  border: 1px solid #aaa;
+  padding: 5px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+
+.logout-btn:hover { color: #fff; border-color: #fff; }
+
+/* 팝업창 (넷플릭스 스타일 블랙 박스) */
+.auth-box {
+  background: rgba(0, 0, 0, 0.85);
+  padding: 60px 68px 40px;
+  border-radius: 4px;
+  width: 100%;
+  max-width: 320px;
+  text-align: left;
+  position: relative;
+  border: 1px solid #333;
+}
+
+.auth-box h2 {
+  color: #fff;
+  font-size: 2rem;
+  margin-bottom: 28px;
+  margin-top: 0;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.auth-form input {
+  background: #333;
+  border: none;
+  border-radius: 4px;
+  padding: 16px 20px;
+  color: #fff;
+  font-size: 1rem;
+}
+
+.auth-form input:focus {
+  outline: none;
+  background: #444;
+}
+
+.auth-submit-btn {
+  background: #e50914;
+  color: white;
+  border: none;
+  padding: 16px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.auth-switch-text {
+  color: #737373;
+  margin-top: 20px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.auth-switch-text:hover { color: #fff; }
+
+.auth-close-btn {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: transparent;
+  border: none;
+  color: #737373;
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.auth-close-btn:hover { color: #fff; }
