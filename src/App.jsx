@@ -6,7 +6,6 @@ const TMDB_API_KEY = "b9a7f747b0597b4f6431d1e55edcb6e3";
 const API_BASE_URL = "https://movie-backend-ebkm.onrender.com"; // 백엔드 주소
 
 function App() {
-  // --- 기존 상태들 ---
   const [movies, setMovies] = useState([]);
   const [selectedMovie, setSelectedMovie] = useState(null);
   const [recommendations, setRecommendations] = useState([]);
@@ -18,13 +17,16 @@ function App() {
   const [skip, setSkip] = useState(0);
   const limit = 20;
 
-  // --- 🔐 새로 추가된 로그인/회원가입 상태 ---
-  const [loggedInUser, setLoggedInUser] = useState(null); // 로그인한 유저 정보 저장
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false); // 로그인 팝업창 열림/닫힘
-  const [authMode, setAuthMode] = useState('login'); // 'login' 모드인지 'signup' 모드인지 확인
-  const [authForm, setAuthForm] = useState({ username: '', password: '' }); // 입력된 아이디/비번
+  // 🌟 [핵심 변경] 처음 켜질 때 '비밀 수첩(localStorage)'을 확인해서 로그인 유지하기!
+  const [loggedInUser, setLoggedInUser] = useState(() => {
+    const savedUser = localStorage.getItem('loggedInUser');
+    return savedUser ? JSON.parse(savedUser) : null;
+  });
 
-  // --- 영화 불러오기 로직 ---
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authMode, setAuthMode] = useState('login');
+  const [authForm, setAuthForm] = useState({ username: '', password: '' });
+
   const fetchMovies = (isReset = false) => {
     const currentSkip = isReset ? 0 : skip;
     fetch(`${API_BASE_URL}/movies?skip=${currentSkip}&limit=${limit}&search=${searchTerm}`)
@@ -39,7 +41,6 @@ function App() {
 
   useEffect(() => { fetchMovies(true); }, []);
 
-  // --- TMDB 포스터 불러오기 로직 ---
   useEffect(() => {
     if (!TMDB_API_KEY) return;
     movies.forEach((movie) => {
@@ -72,7 +73,6 @@ function App() {
     });
   }, [recommendations]);
 
-  // --- 검색 & 클릭 핸들러 ---
   const handleSearch = (e) => {
     e.preventDefault();
     fetchedMovies.current.clear();
@@ -91,7 +91,6 @@ function App() {
       .catch(() => setIsLoading(false));
   };
 
-  // 🌟 별점 남기기 (이제 로그인한 사람만 가능!)
   const handleRating = (score) => {
     if (!loggedInUser) {
       alert("로그인이 필요한 기능입니다! 먼저 로그인해주세요. 🔐");
@@ -100,7 +99,7 @@ function App() {
     }
 
     const ratingData = {
-      user_id: loggedInUser.user_id, // 👈 로그인한 유저의 진짜 ID를 전송
+      user_id: loggedInUser.user_id,
       movie_id: selectedMovie.movie_id,
       rating: score
     };
@@ -121,7 +120,6 @@ function App() {
     return posters[movie.movie_id] || `https://placehold.co/300x450/111/e50914?text=${encodeURIComponent(movie.title.substring(0, 15))}`;
   };
 
-  // 🌟 회원가입 및 로그인 처리 로직
   const handleAuthSubmit = (e) => {
     e.preventDefault();
     const endpoint = authMode === 'login' ? '/login' : '/signup';
@@ -136,10 +134,12 @@ function App() {
         if (data.success) {
           alert(data.message);
           if (authMode === 'login') {
-            setLoggedInUser({ user_id: data.user_id, username: authForm.username });
-            setIsAuthModalOpen(false); // 성공하면 창 닫기
+            const userObj = { user_id: data.user_id, username: authForm.username };
+            setLoggedInUser(userObj);
+            // 🌟 [핵심 변경] 로그인 성공 시 수첩에 정보 적어두기
+            localStorage.setItem('loggedInUser', JSON.stringify(userObj));
+            setIsAuthModalOpen(false); 
           } else {
-            // 회원가입 성공하면 바로 로그인 모드로 전환
             setAuthMode('login'); 
           }
         } else {
@@ -149,17 +149,22 @@ function App() {
       .catch((err) => alert("서버와 연결할 수 없습니다. 백엔드를 확인해주세요!"));
   };
 
+  // 🌟 [핵심 변경] 로그아웃 시 수첩에서 정보 지우기
+  const handleLogout = () => {
+    setLoggedInUser(null);
+    localStorage.removeItem('loggedInUser');
+  };
+
   return (
    <div className="App">
       <header className="main-header">
         <h1>9조 영화추천 AI 사이트</h1>
         
-        {/* 🌟 우측 상단 로그인 프로필 영역 추가 */}
         <div className="auth-header-section">
           {loggedInUser ? (
             <div className="user-profile">
               <span className="welcome-text">🍿 {loggedInUser.username}님</span>
-              <button className="logout-btn" onClick={() => setLoggedInUser(null)}>로그아웃</button>
+              <button className="logout-btn" onClick={handleLogout}>로그아웃</button>
             </div>
           ) : (
             <button className="login-btn" onClick={() => setIsAuthModalOpen(true)}>로그인</button>
@@ -200,7 +205,6 @@ function App() {
         )}
       </main>
 
-      {/* --- 기존 영화 상세 팝업창 --- */}
       {selectedMovie && (
         <div className="modal-overlay" onClick={closeModal}>
           <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -234,7 +238,6 @@ function App() {
         </div>
       )}
 
-      {/* --- 🌟 새로 추가된 로그인/회원가입 팝업창 --- */}
       {isAuthModalOpen && (
         <div className="modal-overlay auth-overlay" onClick={() => setIsAuthModalOpen(false)}>
           <div className="auth-box" onClick={(e) => e.stopPropagation()}>
