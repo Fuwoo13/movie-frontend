@@ -365,3 +365,67 @@ h1 {
 }
 
 .auth-close-btn:hover { color: #fff; }
+
+/* 내 보관함 글씨에 마우스 올렸을 때 효과 */
+.mypage-trigger {
+  cursor: pointer;
+  font-weight: bold;
+  transition: color 0.2s;
+}
+
+.mypage-trigger:hover {
+  color: #e50914; /* 넷플릭스 빨간색으로 하이라이트 */
+}
+
+/* 홈으로 가는 버튼 */
+.home-btn {
+  background: transparent;
+  color: #fff;
+  border: 1px solid #fff;
+  padding: 5px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.8rem;
+}
+.home-btn:hover { background: #fff; color: #000; }
+
+/* 🌟 마이페이지 바둑판 그리드 레이아웃 */
+.mypage-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* 화면 크기에 맞게 자동 정렬 */
+  gap: 25px;
+  padding: 20px 0 60px;
+}
+
+/* 마이페이지 내 전용 카드 배치 조절 */
+.mypage-card {
+  flex: none !important; /* 가로 고정 해제 */
+  width: 100% !important;
+  height: 270px !important;
+}
+
+/* 🌟 내가 준 별점 배지 디자인 */
+.user-rating-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  background: rgba(229, 9, 20, 0.9); /* 빨간 띠 */
+  color: white;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  z-index: 3;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+/* 보관함이 비어있을 때 문구 */
+.empty-mypage {
+  text-align: center;
+  padding: 100px 0;
+  color: #aaa;
+}
+.empty-mypage p {
+  font-size: 1.2rem;
+  margin-bottom: 20px;
+}

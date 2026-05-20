@@ -1,9 +1,8 @@
 import { useEffect, useState, useRef } from 'react';
 import './App.css';
 
-// 🌟 발급받은 TMDB API 키
 const TMDB_API_KEY = "b9a7f747b0597b4f6431d1e55edcb6e3";
-const API_BASE_URL = "https://movie-backend-ebkm.onrender.com"; // 백엔드 주소
+const API_BASE_URL = "https://movie-backend-ebkm.onrender.com"; 
 
 function App() {
   const [movies, setMovies] = useState([]);
@@ -17,7 +16,6 @@ function App() {
   const [skip, setSkip] = useState(0);
   const limit = 20;
 
-  // 🌟 [핵심 변경] 처음 켜질 때 '비밀 수첩(localStorage)'을 확인해서 로그인 유지하기!
   const [loggedInUser, setLoggedInUser] = useState(() => {
     const savedUser = localStorage.getItem('loggedInUser');
     return savedUser ? JSON.parse(savedUser) : null;
@@ -26,6 +24,9 @@ function App() {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authMode, setAuthMode] = useState('login');
   const [authForm, setAuthForm] = useState({ username: '', password: '' });
+
+  const [currentView, setCurrentView] = useState('main'); 
+  const [myRatings, setMyRatings] = useState([]); 
 
   const fetchMovies = (isReset = false) => {
     const currentSkip = isReset ? 0 : skip;
@@ -43,7 +44,8 @@ function App() {
 
   useEffect(() => {
     if (!TMDB_API_KEY) return;
-    movies.forEach((movie) => {
+    const allMovies = [...movies, ...recommendations, ...myRatings];
+    allMovies.forEach((movie) => {
       if (fetchedMovies.current.has(movie.movie_id)) return;
       fetchedMovies.current.add(movie.movie_id);
       const cleanTitle = movie.title.replace(/\(\d{4}\)/, '').trim();
@@ -55,26 +57,29 @@ function App() {
           }
         });
     });
-  }, [movies]);
+  }, [movies, recommendations, myRatings]);
 
-  useEffect(() => {
-    if (!TMDB_API_KEY) return;
-    recommendations.forEach((rec) => {
-      if (fetchedRecs.current.has(rec.movie_id)) return;
-      fetchedRecs.current.add(rec.movie_id);
-      const cleanTitle = rec.title.replace(/\(\d{4}\)/, '').trim();
-      fetch(`https://api.themoviedb.org/3/search/movie?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(cleanTitle)}&language=ko-KR`)
-        .then((res) => res.json())
-        .then((data) => {
-          if (data.results && data.results.length > 0 && data.results[0].poster_path) {
-            setPosters((prev) => ({ ...prev, [rec.movie_id]: `https://image.tmdb.org/t/p/w500${data.results[0].poster_path}` }));
-          }
-        });
-    });
-  }, [recommendations]);
+  const fetchMyRatings = () => {
+    if (!loggedInUser) return;
+    fetch(`${API_BASE_URL}/users/${loggedInUser.user_id}/ratings`)
+      .then((res) => {
+        if (!res.ok) throw new Error("서버 에러 발생");
+        return res.json();
+      })
+      .then((data) => {
+        setMyRatings(Array.isArray(data) ? data : []);
+        setCurrentView('mypage');
+      })
+      .catch((err) => {
+        console.error("마이페이지 로딩 에러:", err);
+        setMyRatings([]); 
+        setCurrentView('mypage');
+      });
+  };
 
   const handleSearch = (e) => {
     e.preventDefault();
+    setCurrentView('main'); 
     fetchedMovies.current.clear();
     fetchMovies(true);
   };
@@ -110,7 +115,10 @@ function App() {
       body: JSON.stringify(ratingData),
     })
       .then((response) => response.json())
-      .then(() => alert(`'${selectedMovie.title}'에 ${score}점을 주셨습니다! ⭐️`))
+      .then(() => {
+        alert(`'${selectedMovie.title}'에 ${score}점을 주셨습니다! ⭐️`);
+        if (currentView === 'mypage') fetchMyRatings(); 
+      })
       .catch((error) => console.error('별점 저장 에러:', error));
   };
 
@@ -136,7 +144,6 @@ function App() {
           if (authMode === 'login') {
             const userObj = { user_id: data.user_id, username: authForm.username };
             setLoggedInUser(userObj);
-            // 🌟 [핵심 변경] 로그인 성공 시 수첩에 정보 적어두기
             localStorage.setItem('loggedInUser', JSON.stringify(userObj));
             setIsAuthModalOpen(false); 
           } else {
@@ -146,25 +153,31 @@ function App() {
           alert(`실패: ${data.message}`);
         }
       })
-      .catch((err) => alert("서버와 연결할 수 없습니다. 백엔드를 확인해주세요!"));
+      .catch(() => alert("서버 연결 실패. 백엔드가 켜져 있는지 확인하세요!"));
   };
 
-  // 🌟 [핵심 변경] 로그아웃 시 수첩에서 정보 지우기
   const handleLogout = () => {
     setLoggedInUser(null);
     localStorage.removeItem('loggedInUser');
+    setCurrentView('main'); 
   };
 
   return (
    <div className="App">
       <header className="main-header">
-        <h1>9조 영화추천 AI 사이트</h1>
+        <h1 onClick={() => setCurrentView('main')} style={{ cursor: 'pointer' }}>9조 영화추천 AI 사이트</h1>
         
         <div className="auth-header-section">
           {loggedInUser ? (
             <div className="user-profile">
-              <span className="welcome-text">🍿 {loggedInUser.username}님</span>
-              <button className="logout-btn" onClick={handleLogout}>로그아웃</button>
+              <span className="welcome-text mypage-trigger" onClick={fetchMyRatings}>
+                🍿 {loggedInUser.username}님의 보관함
+              </span>
+              {/* 🌟 팁: 버튼이 나타났다 사라질 때 헷갈리지 않게 key를 줍니다 */}
+              {currentView === 'mypage' && (
+                <button key="btn-home" className="home-btn" onClick={() => setCurrentView('main')}>홈으로</button>
+              )}
+              <button key="btn-logout" className="logout-btn" onClick={handleLogout}>로그아웃</button>
             </div>
           ) : (
             <button className="login-btn" onClick={() => setIsAuthModalOpen(true)}>로그인</button>
@@ -184,26 +197,52 @@ function App() {
         </div>
       </header>
 
-      <main className="content-area">
-        <h2 className="section-title">지금 뜨는 영화 목록</h2>
-        <div className="movie-carousel">
-          {movies.map((movie, index) => (
-            <div key={`${movie.movie_id}-${index}`} className="movie-card" onClick={() => handleMovieClick(movie)}>
-              <img src={getPosterImage(movie)} alt={movie.title} className="movie-poster" />
-              <div className="card-info">
-                <h3>{movie.title}</h3>
-                <p>🎬 {movie.genres.split('|').join(' · ')}</p>
+      {/* 🌟 핵심 해결책: 화면(<main>)마다 서로 다른 key 명찰을 달아주어 충돌을 방지합니다! */}
+      {currentView === 'main' ? (
+        <main key="view-main" className="content-area">
+          <h2 className="section-title">지금 뜨는 영화 목록</h2>
+          <div className="movie-carousel">
+            {movies.map((movie, index) => (
+              <div key={`main-${movie.movie_id}-${index}`} className="movie-card" onClick={() => handleMovieClick(movie)}>
+                <img src={getPosterImage(movie)} alt={movie.title} className="movie-poster" />
+                <div className="card-info">
+                  <h3>{movie.title}</h3>
+                  <p>🎬 {movie.genres.split('|').join(' · ')}</p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
 
-        {movies.length > 0 && (
-          <button className="load-more-btn" onClick={() => fetchMovies(false)}>
-            더 많은 영화 탐색하기 🍿
-          </button>
-        )}
-      </main>
+          {movies.length > 0 && (
+            <button className="load-more-btn" onClick={() => fetchMovies(false)}>
+              더 많은 영화 탐색하기 🍿
+            </button>
+          )}
+        </main>
+      ) : (
+        <main key="view-mypage" className="content-area">
+          <h2 className="section-title">내가 별점 준 영화들 ({myRatings.length}개)</h2>
+          {myRatings.length === 0 ? (
+            <div className="empty-mypage">
+              <p>아직 별점을 남긴 영화가 없습니다. 🎬</p>
+              <button className="auth-submit-btn" onClick={() => setCurrentView('main')}>영화 보러가기</button>
+            </div>
+          ) : (
+            <div className="mypage-grid">
+              {myRatings.map((movie, index) => (
+                <div key={`mypage-${movie.movie_id}-${index}`} className="movie-card mypage-card" onClick={() => handleMovieClick(movie)}>
+                  <img src={getPosterImage(movie)} alt={movie.title} className="movie-poster" />
+                  <div className="user-rating-badge">⭐ {movie.rating}점</div>
+                  <div className="card-info">
+                    <h3>{movie.title}</h3>
+                    <p>🎬 {movie.genres.split('|').join(' · ')}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </main>
+      )}
 
       {selectedMovie && (
         <div className="modal-overlay" onClick={closeModal}>
@@ -224,7 +263,7 @@ function App() {
             ) : (
               <div className="recommendation-list">
                 {recommendations.map((rec, recIndex) => (
-                  <div key={`${rec.movie_id}-${recIndex}`} className="rec-card">
+                  <div key={`rec-${rec.movie_id}-${recIndex}`} className="rec-card">
                     <img src={getPosterImage(rec)} alt={rec.title} className="movie-poster" />
                     <div className="rec-card-info">
                       <h4>{rec.title}</h4>
@@ -244,23 +283,9 @@ function App() {
             <button className="auth-close-btn" onClick={() => setIsAuthModalOpen(false)}>✕</button>
             <h2>{authMode === 'login' ? '로그인' : '회원가입'}</h2>
             <form onSubmit={handleAuthSubmit} className="auth-form">
-              <input 
-                type="text" 
-                placeholder="아이디" 
-                value={authForm.username} 
-                onChange={(e) => setAuthForm({...authForm, username: e.target.value})}
-                required 
-              />
-              <input 
-                type="password" 
-                placeholder="비밀번호" 
-                value={authForm.password} 
-                onChange={(e) => setAuthForm({...authForm, password: e.target.value})}
-                required 
-              />
-              <button type="submit" className="auth-submit-btn">
-                {authMode === 'login' ? '로그인 시작' : '가입 완료'}
-              </button>
+              <input type="text" placeholder="아이디" value={authForm.username} onChange={(e) => setAuthForm({...authForm, username: e.target.value})} required />
+              <input type="password" placeholder="비밀번호" value={authForm.password} onChange={(e) => setAuthForm({...authForm, password: e.target.value})} required />
+              <button type="submit" className="auth-submit-btn">{authMode === 'login' ? '로그인 시작' : '가입 완료'}</button>
             </form>
             <p className="auth-switch-text" onClick={() => setAuthMode(authMode === 'login' ? 'signup' : 'login')}>
               {authMode === 'login' ? '계정이 없으신가요? 지금 가입하세요.' : '이미 계정이 있으신가요? 로그인하기'}
