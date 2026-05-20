@@ -15,7 +15,20 @@ body {
   width: 90%;
   max-width: 1200px;
   margin: 0 auto;
-  padding-top: 50px;
+  padding-top: 20px; /* 헤더 여백 조정을 위해 수정 */
+}
+
+/* ========================================= */
+/* 🚀 헤더 레이아웃 대수술 (겹침 방지) */
+/* ========================================= */
+
+.main-header {
+  position: relative;
+  /* 우측 상단 메뉴(보관함 등)가 들어갈 수 있도록 위쪽에 충분한 빈 공간(여백)을 확보합니다 */
+  padding-top: 60px; 
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 내부 요소들을 중앙 정렬 */
 }
 
 /* 3. 제목: 9조 간판 */
@@ -25,10 +38,25 @@ h1 {
   color: #8d4549;
   text-align: center;
   margin-bottom: 40px;
+  margin-top: 0; /* 불필요한 위쪽 여백 제거 */
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
+/* 우측 상단 메뉴 영역 (로그인/보관함) */
+.auth-header-section {
+  position: absolute;
+  top: 0; /* 헤더의 맨 위쪽에 찰싹 붙입니다 */
+  right: 0; /* 헤더의 맨 오른쪽에 찰싹 붙입니다 */
+  display: flex;
+  align-items: center;
+  z-index: 10; /* 다른 글씨들보다 위로 올라오게 설정 */
+}
+
 /* 4. 검색창 */
+.search-container {
+  width: 100%; /* 검색창 바구니 너비 설정 */
+}
+
 .search-bar {
   display: flex;
   justify-content: center;
@@ -60,7 +88,7 @@ h1 {
   font-size: 1.5rem;
   margin-bottom: 20px;
   text-align: left;
-  color: #fff; /* 👈 이 부분을 추가하세요! (흰색) */
+  color: #fff;
 }
 
 .movie-carousel {
@@ -173,7 +201,7 @@ h1 {
 .modal-title { 
   font-size: 1.8rem; 
   margin-bottom: 10px; 
-  color: #fff; /* 👈 이 부분을 추가하세요! (흰색) */
+  color: #fff;
 }
 .highlight { color: #e50914; }
 .modal-subtitle { color: #aaa; margin: 20px 0 10px; }
@@ -243,20 +271,10 @@ h1 {
   100% { opacity: 0.5; }
 }
 .pulse { animation: pulse 1.5s infinite ease-in-out; color: #e50914; }
+
 /* ========================================= */
 /* 🔐 로그인 / 회원가입 UI 디자인 */
 /* ========================================= */
-
-/* 헤더 상단 로그인 버튼 위치 조정 */
-.main-header {
-  position: relative; /* 자식 요소 절대 위치 배치를 위한 기준 */
-}
-
-.auth-header-section {
-  position: absolute;
-  top: 0px;
-  right: 10px;
-}
 
 .login-btn {
   background-color: #e50914;
@@ -392,14 +410,14 @@ h1 {
 /* 🌟 마이페이지 바둑판 그리드 레이아웃 */
 .mypage-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); /* 화면 크기에 맞게 자동 정렬 */
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 25px;
   padding: 20px 0 60px;
 }
 
 /* 마이페이지 내 전용 카드 배치 조절 */
 .mypage-card {
-  flex: none !important; /* 가로 고정 해제 */
+  flex: none !important; 
   width: 100% !important;
   height: 270px !important;
 }

@@ -162,28 +162,14 @@ function App() {
     setCurrentView('main'); 
   };
 
-  return (
-   <div className="App">
-      <header className="main-header">
+// --- [수정 후 App.jsx HTML 구조] ---
+return (
+  <div className="App">
+    <header className="main-header">
+      {/* 🌟 [핵심 그룹 1] 중앙에 모여있어야 할 제목과 검색창을 하나의 바구니로 묶습니다. */}
+      <div className="header-center-group">
         <h1 onClick={() => setCurrentView('main')} style={{ cursor: 'pointer' }}>9조 영화추천 AI 사이트</h1>
         
-        <div className="auth-header-section">
-          {loggedInUser ? (
-            <div className="user-profile">
-              <span className="welcome-text mypage-trigger" onClick={fetchMyRatings}>
-                🍿 {loggedInUser.username}님의 보관함
-              </span>
-              {/* 🌟 팁: 버튼이 나타났다 사라질 때 헷갈리지 않게 key를 줍니다 */}
-              {currentView === 'mypage' && (
-                <button key="btn-home" className="home-btn" onClick={() => setCurrentView('main')}>홈으로</button>
-              )}
-              <button key="btn-logout" className="logout-btn" onClick={handleLogout}>로그아웃</button>
-            </div>
-          ) : (
-            <button className="login-btn" onClick={() => setIsAuthModalOpen(true)}>로그인</button>
-          )}
-        </div>
-
         <div className="search-container">
           <form onSubmit={handleSearch} className="search-bar">
             <input 
@@ -195,7 +181,27 @@ function App() {
             <button type="submit">검색</button>
           </form>
         </div>
-      </header>
+      </div>
+
+      {/* 🌟 [핵심 그룹 2] 구석에 박아둘 로그인/마이페이지 영역은 별도의 바구니로 독립시킵니다. */}
+      <div className="auth-header-section">
+        {loggedInUser ? (
+          <div className="user-profile">
+            <span className="welcome-text mypage-trigger" onClick={fetchMyRatings}>
+              🍿 {loggedInUser.username}님의 보관함
+            </span>
+            {currentView === 'mypage' && (
+              <button key="btn-home" className="home-btn" onClick={() => setCurrentView('main')}>홈으로</button>
+            )}
+            <button key="btn-logout" className="logout-btn" onClick={handleLogout}>로그아웃</button>
+          </div>
+        ) : (
+          <button className="login-btn" onClick={() => setIsAuthModalOpen(true)}>로그인</button>
+        )}
+      </div>
+    </header>
+
+    {/* --- (이하 content-area 및 modal 영역은 기존 코드 유지) --- */}
 
       {/* 🌟 핵심 해결책: 화면(<main>)마다 서로 다른 key 명찰을 달아주어 충돌을 방지합니다! */}
       {currentView === 'main' ? (
