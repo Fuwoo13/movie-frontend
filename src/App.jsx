@@ -28,6 +28,13 @@ function App() {
   const [currentView, setCurrentView] = useState('main'); 
   const [myRatings, setMyRatings] = useState([]); 
 
+  // 🌟 [신규] 사진 추천을 위한 상태 변수들
+  const [imageFile, setImageFile] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
+  const [imageRecs, setImageRecs] = useState([]);
+  const [detectedMood, setDetectedMood] = useState("");
+  const [isImageAnalyzing, setIsImageAnalyzing] = useState(false);
+
   const fetchMovies = (isReset = false) => {
     const currentSkip = isReset ? 0 : skip;
     fetch(`${API_BASE_URL}/movies?skip=${currentSkip}&limit=${limit}&search=${searchTerm}`)
@@ -42,9 +49,16 @@ function App() {
 
   useEffect(() => { fetchMovies(true); }, []);
 
+  // 🌟 [수정] imageRecs(사진 추천 영화)도 포스터를 가져오도록 배열에 추가!
   useEffect(() => {
     if (!TMDB_API_KEY) return;
-    const allMovies = [...movies, ...recommendations, ...myRatings];
+    // imageRecs가 진짜 배열(리스트)일 때만 합치고, 아니면 빈 배열로 처리해 기절을 방지합니다.
+const allMovies = [
+  ...movies, 
+  ...recommendations, 
+  ...myRatings, 
+  ...(Array.isArray(imageRecs) ? imageRecs : [])
+];
     allMovies.forEach((movie) => {
       if (fetchedMovies.current.has(movie.movie_id)) return;
       fetchedMovies.current.add(movie.movie_id);
@@ -57,7 +71,7 @@ function App() {
           }
         });
     });
-  }, [movies, recommendations, myRatings]);
+  }, [movies, recommendations, myRatings, imageRecs]);
 
   const fetchMyRatings = () => {
     if (!loggedInUser) return;
@@ -162,48 +176,83 @@ function App() {
     setCurrentView('main'); 
   };
 
-// --- [수정 후 App.jsx HTML 구조] ---
-return (
-  <div className="App">
-    <header className="main-header">
-      {/* 🌟 [핵심 그룹 1] 중앙에 모여있어야 할 제목과 검색창을 하나의 바구니로 묶습니다. */}
-      <div className="header-center-group">
-        <h1 onClick={() => setCurrentView('main')} style={{ cursor: 'pointer' }}>9조 영화추천 AI 사이트</h1>
-        
-        <div className="search-container">
-          <form onSubmit={handleSearch} className="search-bar">
-            <input 
-              type="text" 
-              placeholder="어떤 영화를 찾으시나요?" 
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-            <button type="submit">검색</button>
-          </form>
-        </div>
-      </div>
+  // 🌟 [신규] 사진 선택 시 미리보기 처리 함수
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setImageFile(file);
+      setImagePreview(URL.createObjectURL(file));
+      setImageRecs([]); // 이전 결과 초기화
+      setDetectedMood("");
+    }
+  };
 
-      {/* 🌟 [핵심 그룹 2] 구석에 박아둘 로그인/마이페이지 영역은 별도의 바구니로 독립시킵니다. */}
-      <div className="auth-header-section">
-        {loggedInUser ? (
-          <div className="user-profile">
-            <span className="welcome-text mypage-trigger" onClick={fetchMyRatings}>
-              🍿 {loggedInUser.username}님의 보관함
-            </span>
-            {currentView === 'mypage' && (
-              <button key="btn-home" className="home-btn" onClick={() => setCurrentView('main')}>홈으로</button>
-            )}
-            <button key="btn-logout" className="logout-btn" onClick={handleLogout}>로그아웃</button>
+  // 🌟 [신규] 백엔드에 사진 보내서 결과 받아오는 함수
+  const handleImageSubmit = () => {
+    if (!imageFile) return alert("먼저 사진을 올려주세요!");
+    setIsImageAnalyzing(true);
+
+    const formData = new FormData();
+    formData.append("file", imageFile);
+
+    fetch(`${API_BASE_URL}/recommend-by-image`, {
+      method: "POST",
+      body: formData,
+    })
+.then((res) => {
+        if (!res.ok) throw new Error("백엔드에 아직 사진 API가 배포되지 않았습니다.");
+        return res.json();
+      })
+      .then((data) => {
+        setDetectedMood(data.mood_detected || "분석 실패 😢");
+        // 데이터가 배열로 정상 수신되었을 때만 넣고, 아니면 빈 리스트를 넣습니다.
+        setImageRecs(Array.isArray(data.recommendations) ? data.recommendations : []);
+        setIsImageAnalyzing(false);
+      })
+      .catch((err) => {
+        console.error("사진 분석 에러:", err);
+        setImageRecs([]); // 에러 시 빈 리스트로 초기화하여 팅김 방지
+        setIsImageAnalyzing(false);
+        alert("서버가 아직 준비 중이거나 에러가 발생했습니다. 잠시 후 다시 시도해 주세요!");
+      });
+  };
+
+  return (
+    <div className="App">
+      <header className="main-header">
+        <div className="header-center-group">
+          <h1 onClick={() => setCurrentView('main')} style={{ cursor: 'pointer' }}>9조 영화추천 AI 사이트</h1>
+          
+          <div className="search-container">
+            <form onSubmit={handleSearch} className="search-bar">
+              <input 
+                type="text" 
+                placeholder="어떤 영화를 찾으시나요?" 
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+              <button type="submit">검색</button>
+            </form>
           </div>
-        ) : (
-          <button className="login-btn" onClick={() => setIsAuthModalOpen(true)}>로그인</button>
-        )}
-      </div>
-    </header>
+        </div>
 
-    {/* --- (이하 content-area 및 modal 영역은 기존 코드 유지) --- */}
+        <div className="auth-header-section">
+          {loggedInUser ? (
+            <div className="user-profile">
+              <span className="welcome-text mypage-trigger" onClick={fetchMyRatings}>
+                🍿 {loggedInUser.username}님의 보관함
+              </span>
+              {currentView === 'mypage' && (
+                <button key="btn-home" className="home-btn" onClick={() => setCurrentView('main')}>홈으로</button>
+              )}
+              <button key="btn-logout" className="logout-btn" onClick={handleLogout}>로그아웃</button>
+            </div>
+          ) : (
+            <button className="login-btn" onClick={() => setIsAuthModalOpen(true)}>로그인</button>
+          )}
+        </div>
+      </header>
 
-      {/* 🌟 핵심 해결책: 화면(<main>)마다 서로 다른 key 명찰을 달아주어 충돌을 방지합니다! */}
       {currentView === 'main' ? (
         <main key="view-main" className="content-area">
           <h2 className="section-title">지금 뜨는 영화 목록</h2>
@@ -224,6 +273,49 @@ return (
               더 많은 영화 탐색하기 🍿
             </button>
           )}
+
+          {/* ======================================================== */}
+          {/* 📸 [신규] 사진으로 찾는 AI 영화 추천 섹션 */}
+          {/* ======================================================== */}
+          <hr className="divider" />
+          <div className="image-ai-section">
+            <h2 className="section-title" style={{ textAlign: 'center' }}>📸 사진으로 찾는 내 취향 영화</h2>
+            <p className="image-ai-desc">지금 당신의 기분이나 분위기가 담긴 사진을 올려주세요. AI가 어울리는 영화를 찾아드립니다!</p>
+            
+            <div className="image-upload-box">
+              <input type="file" accept="image/*" onChange={handleImageChange} id="file-upload" className="file-input" />
+              <label htmlFor="file-upload" className="file-upload-label">
+                {imagePreview ? "다른 사진 고르기" : "📷 사진 업로드하기"}
+              </label>
+              
+              {imagePreview && (
+                <div className="image-preview-container">
+                  <img src={imagePreview} alt="미리보기" className="image-preview" />
+                  <button className="analyze-btn" onClick={handleImageSubmit} disabled={isImageAnalyzing}>
+                    {isImageAnalyzing ? "🤖 AI가 사진 분석 중..." : "✨ 이 사진으로 영화 추천받기"}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* AI 분석 결과 출력 */}
+            {detectedMood && (
+              <div className="image-result-box">
+                <h3 className="mood-text">분석된 분위기: <span className="highlight">{detectedMood}</span></h3>
+                <div className="recommendation-list">
+                  {imageRecs.map((rec, recIndex) => (
+                    <div key={`img-rec-${rec.movie_id}-${recIndex}`} className="rec-card" onClick={() => handleMovieClick(rec)}>
+                      <img src={getPosterImage(rec)} alt={rec.title} className="movie-poster" />
+                      <div className="rec-card-info">
+                        <h4>{rec.title}</h4>
+                        <p>{rec.genres.split('|').join(' · ')}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
         </main>
       ) : (
         <main key="view-mypage" className="content-area">
